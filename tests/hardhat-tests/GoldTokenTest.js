@@ -33,4 +33,20 @@ describe("TavernGoldToken", function () {
       initialOwnerBalance
     );
   });
+
+  it("Should assign the DEFAULT_ADMIN_ROLE to the owner", async function () {
+    const hasRole = await goldToken.hasRole(
+      await goldToken.DEFAULT_ADMIN_ROLE(),
+      owner.address
+    );
+    expect(hasRole).to.be.true;
+  });
+
+  it("Should assign the TOKEN_MINTER_ROLE to the owner", async function () {
+    const hasRole = await goldToken.hasRole(
+      await goldToken.TOKEN_MINTER_ROLE(),
+      owner.address
+    );
+    expect(hasRole).to.be.true;
+  });
 }); 
