@@ -24,5 +24,3 @@ It combines modern Web3 tooling with a streamlined game management experience to
 Stay tuned — and if you're a builder, wanderer, or DM-for-hire, you'll want in.
 
 > "Every great campaign starts with one brave soul asking, 'When are we playing?'"
-
-<!-- Temporary comment for testing Git configuration -->
