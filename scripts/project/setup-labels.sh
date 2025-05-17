@@ -46,11 +46,13 @@ echo "🎯 Updating labels in GitHub repo: $REPO"
 for i in "${!LABEL_NAMES[@]}"; do
   label="${LABEL_NAMES[$i]}"
   color="${LABEL_COLORS[$i]}"
-  echo "🎨 Updating label '$label' to color $color..."
-  gh label edit "$label" --repo "$REPO" --color "${color/#\#}" 2>/dev/null || {
-    echo "➕ Label '$label' not found, creating..."
-    gh label create "$label" --repo "$REPO" --color "${color/#\#}" --description ""
-  }
+  if gh label list --repo "$REPO" | grep -q "^$label"; then
+    echo "✅ Label '$label' exists. Updating color to $color..."
+    gh label edit "$label" --repo "$REPO" --color "${color/#\#}" --description "" >/dev/null
+  else
+    echo "➕ Label '$label' not found. Creating with color $color..."
+    gh label create "$label" --repo "$REPO" --color "${color/#\#}" --description "" >/dev/null
+  fi
 done
 
 echo "✅ All labels are updated and aligned with the color scheme."
