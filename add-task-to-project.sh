@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Tavern.Plus GitHub Project Issue Creator (Enhanced)
-# Supports: title as CLI arg, clipboard body, color output, help text
+# Supports: --title, --body, --labels, --sort, color output, help text
 
 REPO="BrentBrown/tavern-plus"
 PROJECT_ID="PVT_kwHOAATKCc4A5MuQ"
@@ -15,35 +15,67 @@ RESET='\033[0m'
 
 # Show help if needed
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-  echo -e "${CYAN}Usage:${RESET} addtask \"<title>\" [--from-clipboard]"
-  echo -e "${CYAN}Example:${RESET} addtask \"frontend: install TailwindCSS\""
-  echo -e "         addtask \"contract: deploy Gold\" --from-clipboard"
+  echo -e "${CYAN}Usage:${RESET} addtask --title \"<title>\" [--body \"<body>\"] [--labels \"label1,label2\"] [--sort <number>]"
+  echo -e "${CYAN}Example:${RESET} addtask --title \"frontend: install TailwindCSS\" --body \"Install via npm and configure.\" --labels \"frontend,priority-high\" --sort 2"
   exit 0
 fi
 
+# Initialize variables
+TITLE=""
+BODY=""
+LABELS=""
+SORT=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --title)
+      shift
+      TITLE="$1"
+      ;;
+    --body)
+      shift
+      BODY="$1"
+      ;;
+    --labels)
+      shift
+      LABELS="$1"
+      ;;
+    --sort)
+      shift
+      SORT="$1"
+      ;;
+    *)
+      echo -e "${RED}❌ Unknown argument: $1${RESET}"
+      exit 1
+      ;;
+  esac
+  shift
+done
+
 # Validate title
-TITLE="$1"
 if [ -z "$TITLE" ]; then
-  echo -e "${RED}❌ You must provide an issue title.${RESET}"
-  echo "Try: addtask \"Your title here\""
+  echo -e "${RED}❌ You must provide an issue title with --title.${RESET}"
+  echo "Try: addtask --title \"Your title here\""
   exit 1
 fi
 
-# Fetch or enter body
-if [ "$2" == "--from-clipboard" ]; then
-  echo -e "${YELLOW}📄 Using issue body from clipboard...${RESET}"
-  BODY=$(pbpaste)
-else
-  echo -e "${CYAN}📄 Enter Issue Body. Type EOF on a new line when finished:${RESET}"
-  BODY=""
-  while IFS= read -r LINE; do
-    [[ "$LINE" == "EOF" ]] && break
-    BODY+="$LINE"$'\n'
-  done
+if [[ -z "$BODY" ]]; then
+  echo -e "${YELLOW}⚠️  No body provided. Proceeding with empty body.${RESET}"
 fi
 
-if [[ -z "$BODY" ]]; then
-  echo -e "${YELLOW}⚠️  No body entered. Proceeding with empty body.${RESET}"
+# Prepare labels argument
+LABEL_ARG=()
+if [[ -n "$LABELS" ]]; then
+  IFS=',' read -ra LABEL_ARRAY <<< "$LABELS"
+  for label in "${LABEL_ARRAY[@]}"; do
+    # Check if label exists
+    if ! gh label list --repo "$REPO" | grep -Fxq "$label"; then
+      echo -e "${YELLOW}⚠️  Label '$label' does not exist. Creating it...${RESET}"
+      gh label create "$label" --repo "$REPO" --color "ededed" --description ""
+    fi
+    LABEL_ARG+=(--label "$label")
+  done
 fi
 
 # Create the issue
@@ -51,7 +83,8 @@ echo -e "${CYAN}📤 Creating issue: ${RESET}$TITLE"
 ISSUE_URL=$(gh issue create \
   --repo "$REPO" \
   --title "$TITLE" \
-  --body "$BODY")
+  --body "$BODY" \
+  "${LABEL_ARG[@]}")
 
 if [[ -z "$ISSUE_URL" ]]; then
   echo -e "${RED}❌ Issue creation failed.${RESET}"
@@ -83,4 +116,8 @@ mutation($project: ID!, $issue: ID!) {
 }' -f project="$PROJECT_ID" -f issue="$ISSUE_ID"
 
 echo -e "${GREEN}✅ Issue added to project board (in 'No Status').${RESET}"
-echo -e "${YELLOW}👉 Reminder: manually move it to the correct column.${RESET}"
+
+if [[ -n "$SORT" ]]; then
+  echo -e "${YELLOW}👉 Reminder: GitHub Projects API v2 does not support setting sort order via API.${RESET}"
+  echo -e "${YELLOW}👉 Please set the sort order manually for issue #$ISSUE_NUMBER.${RESET}"
+fi
