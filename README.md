@@ -1,5 +1,3 @@
-Here you go — the complete README.md in raw Markdown, ready to paste directly into your GitHub repo:
-
 # Tavern.Plus
 
 **Tavern.Plus** is a decentralized platform for scheduling, rewarding, and tracking participation in online tabletop RPG sessions.
