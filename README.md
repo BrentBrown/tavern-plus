@@ -13,11 +13,11 @@ It combines modern Web3 tooling with a streamlined game management experience to
 - ⚙️ Powered by Hardhat, Wagmi, RainbowKit, and Next.js  
 
 ## Repo Structure
-
+```text
 /contracts   → Solidity contracts (Gold, Renown, SessionRegistry)
 /frontend    → Next.js app (profile, session browser, wallet)
 /README.md   → You’re reading it!
-
+```
 ## Status
 
 🚧 **MVP development underway.**  
