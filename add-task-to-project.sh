@@ -195,7 +195,7 @@ if [[ -n "$LABELS" ]]; then
   IFS=',' read -ra LABEL_ARRAY <<< "$LABELS"
   for label in "${LABEL_ARRAY[@]}"; do
     # Check if label exists
-    if ! gh label list --repo "$REPO" | grep -Fxq "$label"; then
+    if ! gh label list --repo "$REPO" --limit 1000 | awk -F '\t' '{print $1}' | grep -Fxq "$label"; then
       echo -e "${YELLOW}⚠️  Label '$label' does not exist. Creating it...${RESET}"
       gh label create "$label" --repo "$REPO" --color "ededed" --description ""
     fi
