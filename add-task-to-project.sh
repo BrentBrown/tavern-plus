@@ -15,8 +15,27 @@ RESET='\033[0m'
 
 # Show help if needed
 if [[ "$1" == "--help" || "$1" == "-h" ]]; then
-  echo -e "${CYAN}Usage:${RESET} addtask --title \"<title>\" [--body \"<body>\"] [--labels \"label1,label2\"] [--sort <number>]"
-  echo -e "${CYAN}Example:${RESET} addtask --title \"frontend: install TailwindCSS\" --body \"Install via npm and configure.\" --labels \"frontend,priority-high\" --sort 2"
+  echo -e "${CYAN}NAME${RESET}"
+  echo -e "  addtask - Create a GitHub issue and add it to a Tavern.Plus project board"
+  echo
+  echo -e "${CYAN}SYNOPSIS${RESET}"
+  echo -e "  addtask --title \"<title>\" [--body \"<body>\"] [--labels \"label1,label2\"] [--sort <number>]"
+  echo
+  echo -e "${CYAN}DESCRIPTION${RESET}"
+  echo -e "  This script creates a new GitHub issue in the Tavern.Plus repository and adds it to the project board."
+  echo -e "  Supports specifying the issue title, body, labels, and a sort order reminder."
+  echo
+  echo -e "${CYAN}OPTIONS${RESET}"
+  echo -e "  --title   The title of the GitHub issue (required)."
+  echo -e "  --body    The body content of the issue (optional)."
+  echo -e "  --labels  Comma-separated list of labels to apply to the issue (optional)."
+  echo -e "  --sort    Reminder number for sort order (optional; API does not support automatic sorting)."
+  echo -e "  -h, --help"
+  echo -e "           Show this help message and exit."
+  echo
+  echo -e "${CYAN}EXAMPLES${RESET}"
+  echo -e "  addtask --title \"frontend: install TailwindCSS\" --body \"Install via npm and configure.\" --labels \"frontend,priority-high\" --sort 2"
+  echo -e "  addtask --title \"backend: fix API bug\""
   exit 0
 fi
 
