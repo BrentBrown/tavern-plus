@@ -109,4 +109,44 @@ describe("TavernGoldToken", function () {
             ).to.be.revertedWith("Tip amount must be greater than 0");
         });
     });
+
+    describe("Account Information", function () {
+        it("Should register and retrieve account numbers", async function () {
+            await token.registerAccount(addr1.address);
+            const accountNumber = await token.getAccountNumber(addr1.address);
+            expect(accountNumber).to.equal(1);
+
+            await token.registerAccount(addr2.address);
+            const accountNumber2 = await token.getAccountNumber(addr2.address);
+            expect(accountNumber2).to.equal(2);
+        });
+
+        it("Should not allow re-registration of accounts", async function () {
+            await token.registerAccount(addr1.address);
+            await expect(
+                token.registerAccount(addr1.address)
+            ).to.be.revertedWith("Account already registered");
+        });
+
+        it("Should return correct roles for an account", async function () {
+            const roles = await token.getRoles(owner.address);
+            expect(roles).to.include("Admin");
+            expect(roles).to.include("Token Minter");
+        });
+
+        it("Should return complete account information", async function () {
+            await token.registerAccount(addr1.address);
+            const [accountNumber, balance, roles] = await token.getAccountInfo(addr1.address);
+            
+            expect(accountNumber).to.equal(1);
+            expect(balance).to.equal(0);
+            expect(roles).to.be.an('array');
+        });
+
+        it("Should emit AccountRegistered event", async function () {
+            await expect(token.registerAccount(addr1.address))
+                .to.emit(token, "AccountRegistered")
+                .withArgs(addr1.address, 1);
+        });
+    });
 }); 
