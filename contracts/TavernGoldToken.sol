@@ -34,4 +34,22 @@ contract TavernGoldToken is ERC20, AccessControl {
 
     // Role for security auditors or reviewers of the smart contract and infrastructure
     bytes32 public constant AUDITOR_ROLE = keccak256("AUDITOR_ROLE");
+
+    // Event emitted when a tip is sent
+    event TipSent(address indexed from, address indexed to, uint256 amount, string message);
+
+    /**
+     * @dev Allows users to send a tip to another account
+     * @param to The address to send the tip to
+     * @param amount The amount of tokens to send
+     * @param message Optional message accompanying the tip
+     */
+    function tip(address to, uint256 amount, string memory message) public {
+        require(to != address(0), "Cannot tip zero address");
+        require(amount > 0, "Tip amount must be greater than 0");
+        require(balanceOf(msg.sender) >= amount, "Insufficient balance");
+
+        _transfer(msg.sender, to, amount);
+        emit TipSent(msg.sender, to, amount, message);
+    }
 }
